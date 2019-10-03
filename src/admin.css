@@ -1,0 +1,17 @@
+.btn-menu {
+  display: none;
+}
+
+@media all and (max-width: 768px) {
+  .sidebar {
+    position: 'absolute';
+    top: 0;
+    left: 0;
+    height: 100vh;
+    margin-left: -100%;
+  }
+
+  .btn-menu {
+    display: inline-block;
+  }
+}
