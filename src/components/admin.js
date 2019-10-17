@@ -1,110 +1,110 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { Link } from 'react-router-dom'
-import { CometChat } from '@cometchat-pro/chat'
-import '../admin.css'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { CometChat } from '@cometchat-pro/chat';
+import '../admin.css';
 
-import axios from 'axios'
+import axios from 'axios';
 
 function Admin() {
-  const { uid } = useParams()
-  const [isOpen, setIsOpen] = useState(false)
+  const { uid } = useParams();
+  const [isOpen, setIsOpen] = useState(false);
 
-  const [clients, setClients] = useState([])
-  const [currentUser, setCurrentUser] = useState(null)
-  const [messages, setMessages] = useState([])
-  const [message, setMessage] = useState('')
+  const [clients, setClients] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState('');
 
-  const adminUID = 'admin'
+  const adminUID = 'admin';
 
   useEffect(() => {
     const createAuthToken = async () => {
       try {
         const response = await axios.get(
           `http://localhost:4000/api/auth-user?uid=${adminUID}`
-        )
-        const admin = await response.data.user
+        );
+        const admin = await response.data.user;
 
         CometChat.login(admin.authToken).then(
           loggedInAdmin => {
-            fetchClients()
+            fetchClients();
           },
           error => {
-            console.log('Error logging in', error)
+            console.log('Error logging in', error);
           }
-        )
+        );
       } catch (err) {
-        console.log({ err })
+        console.log({ err });
       }
-    }
+    };
 
     const fetchClients = async () => {
-      const response = await axios.get('http://localhost:4000/api/get-clients')
+      const response = await axios.get('http://localhost:4000/api/get-clients');
 
-      const _clients = await response.data.clients
-      setClients([..._clients])
-      const currentClient = _clients.find(c => c.uid === uid)
-      setCurrentUser(currentClient)
-    }
+      const _clients = await response.data.clients;
+      setClients([..._clients]);
+      const currentClient = _clients.find(c => c.uid === uid);
+      setCurrentUser(currentClient);
+    };
 
-    createAuthToken()
-  }, [uid])
+    createAuthToken();
+  }, [uid]);
 
   useEffect(() => {
     if (uid) {
       const messagesRequest = new CometChat.MessagesRequestBuilder()
         .setUID(uid)
         .setLimit(50)
-        .build()
+        .build();
       messagesRequest.fetchPrevious().then(
         msgs => {
-          setMessages([...msgs])
+          setMessages([...msgs]);
         },
         error => {
-          console.log('Message fetching failed with error:', error)
+          console.log('Message fetching failed with error:', error);
         }
-      )
+      );
     }
-  }, [uid])
+  }, [uid]);
 
   useEffect(() => {
-    const listenerId = 'admin-listener-id'
+    const listenerId = 'admin-listener-id';
     const listenForNewMessages = () => {
       CometChat.addMessageListener(
         listenerId,
         new CometChat.MessageListener({
           onTextMessageReceived: msg => {
-            setMessages(prevMessages => [...prevMessages, msg])
+            setMessages(prevMessages => [...prevMessages, msg]);
           }
         })
-      )
-    }
+      );
+    };
 
-    listenForNewMessages()
+    listenForNewMessages();
 
-    return () => CometChat.removeMessageListener(listenerId)
-  }, [])
+    return () => CometChat.removeMessageListener(listenerId);
+  }, []);
 
   const handleSendMessage = e => {
-    e.preventDefault()
-    const _message = message
-    setMessage('')
+    e.preventDefault();
+    const _message = message;
+    setMessage('');
     const textMessage = new CometChat.TextMessage(
       uid,
       _message,
       CometChat.MESSAGE_TYPE.TEXT,
       CometChat.RECEIVER_TYPE.USER
-    )
+    );
 
     CometChat.sendMessage(textMessage).then(
       msg => {
-        setMessages(prevMessages => [...prevMessages, msg])
+        setMessages(prevMessages => [...prevMessages, msg]);
       },
       error => {
-        console.log('Message sending failed with error:', error)
+        console.log('Message sending failed with error:', error);
       }
-    )
-  }
+    );
+  };
 
   return (
     <div
@@ -234,7 +234,7 @@ function Admin() {
         </footer>
       </div>
     </div>
-  )
+  );
 }
 
-export default Admin
+export default Admin;

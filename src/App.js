@@ -1,7 +1,7 @@
-import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import Client from './components/client'
-import Admin from './components/admin'
+import React from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import Client from './components/client';
+import Admin from './components/admin';
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         </Route>
       </Router>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
