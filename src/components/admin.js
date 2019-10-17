@@ -2,13 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { CometChat } from '@cometchat-pro/chat';
-import '../admin.css';
 
 import axios from 'axios';
 
 function Admin() {
   const { uid } = useParams();
-  const [isOpen, setIsOpen] = useState(false);
 
   const [clients, setClients] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
@@ -98,7 +96,7 @@ function Admin() {
 
     CometChat.sendMessage(textMessage).then(
       msg => {
-        setMessages(prevMessages => [...prevMessages, msg]);
+        setMessages([...messages, msg]);
       },
       error => {
         console.log('Message sending failed with error:', error);
@@ -107,131 +105,121 @@ function Admin() {
   };
 
   return (
-    <div
-      className='row w-100 mx-auto'
-      style={{ height: '100vh', overflow: 'hidden', position: 'relative' }}
-    >
-      <div
-        className='col-12 col-md-4 sidebar bg-white'
-        style={{
-          marginLeft: isOpen && '0',
-          transition: 'margin 0.3s ease-in-out'
-        }}
-      >
-        <div className='py-2'>
-          <button
-            className='mr-2 btn btn-light btn-menu'
-            onClick={() => setIsOpen(false)}
-          >
-            &larr; Close
-          </button>
-          <span className='lead'>Clients</span>
+    <div style={{ height: '100vh' }}>
+      <header className='bg-secondary text-white' style={{ height: '50px' }}>
+        <div className='container'>
+          <h3 className='px-3'>
+            Dashboard | {currentUser && currentUser.name}
+          </h3>
         </div>
-        <ul className='list-group'>
-          {clients.length > 0 ? (
-            clients.map(c => (
-              <li className='list-group-item' key={c.uid}>
-                <Link
-                  className={`lead ${
-                    c.status === 'offline' ? 'text-dark' : 'text-success'
-                  }`}
-                  to={`/admin/${c.uid}`}
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))
-          ) : (
-            <span>Fetching clients</span>
-          )}
-        </ul>
-      </div>
-      <div
-        className='p-2 col-12 col-md-8 d-flex flex-column justify-content-between bg-white'
-        style={{ position: 'relative' }}
-      >
-        <header
-          className=''
-          style={{
-            height: '60px',
-            width: '100%'
-          }}
-        >
-          <button
-            className='mr-2 btn btn-light btn-menu'
-            onClick={() => setIsOpen(true)}
+      </header>
+      <div className='container' style={{ height: 'calc(100vh - 50px)' }}>
+        <div className='d-flex' style={{ height: '100%' }}>
+          <aside
+            className='bg-light p-3'
+            style={{ width: '30%', height: '100%' }}
           >
-            Menu
-          </button>
-
-          <p className='lead d-inline-block'>
-            {currentUser && currentUser.name}
-          </p>
-        </header>
-        <main
-          className='mb-1 pb-2 d-flex flex-column justify-content-start'
-          style={{
-            flex: 1,
-            height: '50vh'
-          }}
-        >
-          <ul
-            className='list-group'
+            {clients.length > 0 ? (
+              clients.map(c => (
+                <li
+                  style={{
+                    background: 'transparent',
+                    border: 0,
+                    borderBottom: '1px solid #ccc'
+                  }}
+                  className='list-group-item'
+                  key={c.uid}
+                >
+                  <Link
+                    className={`lead ${
+                      c.status === 'offline' ? 'text-link' : 'text-success'
+                    }`}
+                    to={`/admin/${c.uid}`}
+                  >
+                    {c.name}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <span>Fetching clients</span>
+            )}
+          </aside>
+          <main
+            className='p-3 d-flex flex-column'
             style={{
-              position: 'relative',
-              overflowY: 'scroll',
-              flex: 1
+              flex: '1',
+              height: 'calc(100vh - 60px)',
+              position: 'relative'
             }}
           >
-            {messages.length > 0 &&
-              messages.map(m => (
-                <li
-                  className='list-group-item mb-2 px-0'
-                  key={m.id}
-                  style={{
-                    border: 0,
-                    background: 'transparent',
-                    textAlign: m.sender.uid === uid ? 'left' : 'right'
-                  }}
+            <div className='chat-box' style={{ flex: '1', height: '70vh' }}>
+              {uid !== undefined && clients.length > 0 ? (
+                <ul
+                  className='list-group px-3'
+                  style={{ height: '100%', overflowY: 'scroll' }}
                 >
-                  <span
-                    className='py-2 px-3'
-                    style={{
-                      background: m.sender.uid === uid ? '#F4F7F9' : '#A3EAF7',
-                      borderRadius: '4px'
-                    }}
-                  >
-                    {m.text}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </main>
-        <footer
-          style={{
-            height: '60px',
-            marginBottom: '1rem',
-            bottom: 0
-          }}
-        >
-          <form
-            className='w-100 d-flex justify-content-between align-items-center'
-            onSubmit={e => handleSendMessage(e)}
-          >
-            <div className='form-group w-100'>
-              <input
-                type='text'
-                className='form-control form-control-lg mt-3'
-                placeholder='Type to send message'
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-              />
+                  {messages.length > 0 ? (
+                    messages.map(m => (
+                      <li
+                        className='list-group-item mb-2 px-0'
+                        key={m.id}
+                        style={{
+                          border: 0,
+                          background: 'transparent',
+                          textAlign: m.sender.uid === uid ? 'left' : 'right'
+                        }}
+                      >
+                        <span
+                          className='py-2 px-3'
+                          style={{
+                            background:
+                              m.sender.uid === uid ? '#F4F7F9' : '#A3EAF7',
+                            borderRadius: '4px'
+                          }}
+                        >
+                          {m.text}
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <p className='lead'>Loading Messages</p>
+                  )}
+                </ul>
+              ) : (
+                <div>
+                  <h3 className='text-dark'>Chats</h3>
+                  <p className='lead'>Select a chat to load the messages</p>
+                </div>
+              )}
             </div>
-            <button className='btn btn-dark btn-lg' type='submit'>
-              Send
-            </button>
-          </form>
-        </footer>
+            {uid !== undefined && (
+              <div
+                className='chat-form'
+                style={{
+                  height: '50px'
+                }}
+              >
+                <form
+                  className='w-100 d-flex justify-content-between align-items-center'
+                  onSubmit={e => handleSendMessage(e)}
+                >
+                  <div className='form-group w-100'>
+                    <input
+                      type='text'
+                      className='form-control mt-3'
+                      placeholder='Type to send message'
+                      value={message}
+                      onChange={e => setMessage(e.target.value)}
+                    />
+                  </div>
+                  <button className='btn btn-secondary' type='submit'>
+                    Send
+                  </button>
+                </form>
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );

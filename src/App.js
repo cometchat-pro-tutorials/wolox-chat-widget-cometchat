@@ -5,7 +5,7 @@ import Admin from './components/admin';
 
 function App() {
   return (
-    <div className='container' style={{ height: '100%' }}>
+    <div style={{ height: '100%' }}>
       <Router>
         <Route exact path='/'>
           <Client />

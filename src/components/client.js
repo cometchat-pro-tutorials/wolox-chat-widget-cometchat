@@ -8,6 +8,7 @@ import {
   dropMessages
 } from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
+import { Link } from 'react-router-dom';
 
 function Client() {
   const clientUID = localStorage.getItem('cometchat:client-uid');
@@ -123,11 +124,39 @@ function Client() {
   };
 
   return (
-    <div
-      className='d-flex justify-content-center align-items-center'
-      style={{ height: '100vh' }}
-    >
-      <h1>Hello World!</h1>
+    <div>
+      <header>
+        <div className='container py-2'>
+          <div>
+            <h1 className='text-center text-dark'>ACME</h1>
+          </div>
+
+          <ul className='nav nav-tabs'>
+            <li className='nav-item'>
+              <Link className='nav-link active' to='/'>
+                Home
+              </Link>
+            </li>
+            <li className='nav-item'>
+              <Link className='nav-link' to='/admin'>
+                Admin
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </header>
+      <div className='jumbotron'>
+        <div className='container text-center'>
+          <h1 className='display-4'>ACME</h1>
+          <p className='lead'>
+            ACME is a San Francisco based design agency. We build amazing web
+            experiences
+          </p>
+          <Link className='btn btn-primary btn-lg' to='/' role='button'>
+            Learn more
+          </Link>
+        </div>
+      </div>
       <Widget
         handleNewUserMessage={handleNewUserMessage}
         title='Live Chat'
