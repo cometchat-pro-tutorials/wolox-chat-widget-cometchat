@@ -1,14 +1,14 @@
-import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Client from './components/client';
-import Admin from './components/admin';
+import React from 'react'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import User from './components/user'
+import Admin from './components/admin'
 
 function App() {
   return (
     <div style={{ height: '100%' }}>
       <Router>
         <Route exact path='/'>
-          <Client />
+          <User />
         </Route>
         <Route exact path='/admin'>
           <Admin />
@@ -18,7 +18,7 @@ function App() {
         </Route>
       </Router>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

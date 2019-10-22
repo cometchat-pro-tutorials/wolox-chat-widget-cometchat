@@ -18,16 +18,16 @@ In order to run the demo application locally, you'll need to follow the followin
 4. Go to the **API Keys** tab and you should see an already generated **App ID** and **API Key**
 5. Copy the details from the list with **Full Access** as Scope.
 6. Go to the **Users** tab and create a new user. Use **Admin** as the name and **admin** as the uid of the user.
-7. Clone this repository and move into the newly created project directory. In the project directory, create a `.env` file and paste the following snippet.
+7. Clone this repository and move into the newly created project directory. Then `cd backend`, create a `.env` file and paste the following snippet.
 
 ```
-REACT_APP_COMETCHAT_API_KEY=YOUR_API_KEY
-REACT_APP_COMETCHAT_APP_ID=YOUR_APP_ID
+COMETCHAT_API_KEY=YOUR_API_KEY
+COMETCHAT_APP_ID=YOUR_APP_ID
 ```
 
-8. Run `npm install` to install all the needed dependencies.
-9. Run `npm run server` to start the node.js development server on port 4000.
-10. Run `npm run start` to start the react app in development mode
+8. Run `npm install` in `frontend` and `backend` folders to install all the dependencies.
+9. Run `npm run server` in `backend` to start the node.js development server on port 4000.
+10. Run `npm run start` in `frontend` to start the react app in development mode
 11. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Available Routes
