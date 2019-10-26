@@ -1,7 +1,7 @@
 const config = {
   adminUID: 'admin',
   adminName: 'Admin',
-  appID: '89217065ecac0c'
+  appID: 'YOUR_APP_ID'
 }
 
 export default config

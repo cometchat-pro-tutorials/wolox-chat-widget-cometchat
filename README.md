@@ -26,9 +26,10 @@ COMETCHAT_APP_ID=YOUR_APP_ID
 ```
 
 8. Run `npm install` in `frontend` and `backend` folders to install all the dependencies.
-9. Run `npm run server` in `backend` to start the node.js development server on port 4000.
-10. Run `npm run start` in `frontend` to start the react app in development mode
-11. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+9. Open `frontend/src/config.js` and edit the `appID` key with your own appID.
+10. Run `npm run server` in `backend` to start the node.js development server on port 4000.
+11. Run `npm run start` in `frontend` to start the react app in development mode
+12. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Available Routes
 

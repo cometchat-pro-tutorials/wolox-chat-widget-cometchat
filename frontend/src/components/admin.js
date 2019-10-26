@@ -8,7 +8,6 @@ function Admin() {
   const { uid } = useParams()
 
   const [users, setUsers] = useState([])
-  const [currentUser, setCurrentUser] = useState(null)
   const [messages, setMessages] = useState([])
   const [message, setMessage] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -50,11 +49,6 @@ function Admin() {
   }, [isLoggedIn])
 
   useEffect(() => {
-    const _currentUser = users.find(user => user.uid === uid)
-    setCurrentUser(_currentUser)
-  }, [uid, users])
-
-  useEffect(() => {
     const listenerId = 'message-listener-id'
     const listenForNewMessages = () => {
       CometChat.addMessageListener(
@@ -86,13 +80,22 @@ function Admin() {
           if (targetUser && targetUser.uid === offlineUser.uid) {
             const otherUsers = users.filter(u => u.uid !== offlineUser.uid)
             setUsers([...otherUsers, offlineUser])
+            const messagesCopy = [...messages]
+            const messagesToKeep = messagesCopy.filter(
+              m =>
+                m.receiver !== uid &&
+                m.sender.uid !== config.adminUID &&
+                (m.receiver !== config.adminUID && m.sender.uid !== uid)
+            )
+
+            setMessages(messagesToKeep)
           }
         }
       })
     )
 
     return () => CometChat.removeUserListener(listenerID)
-  }, [users])
+  }, [users, messages, uid])
 
   const handleSendMessage = async e => {
     e.preventDefault()
@@ -101,7 +104,7 @@ function Admin() {
     setMessage('')
 
     const textMessage = new CometChat.TextMessage(
-      currentUser.uid,
+      uid,
       _message,
       CometChat.MESSAGE_TYPE.TEXT,
       CometChat.RECEIVER_TYPE.USER
@@ -117,18 +120,27 @@ function Admin() {
 
   return (
     <div style={{ height: '100vh' }}>
-      <header className='bg-secondary text-white' style={{ height: '50px' }}>
-        <div className='container'>
-          <h3 className='px-3'>
-            Dashboard | {currentUser && currentUser.name}
-          </h3>
-        </div>
+      <header
+        className='bg-secondary text-white d-flex align-items-center'
+        style={{ height: '50px' }}
+      >
+        <h3 className='px-3'>
+          <Link to='/admin' className='text-white'>
+            Dashboard
+          </Link>
+        </h3>
+        {uid && (
+          <span>
+            {' - '}
+            {uid}
+          </span>
+        )}
       </header>
-      <div className='container' style={{ height: 'calc(100vh - 50px)' }}>
+      <div style={{ height: 'calc(100vh - 50px)' }}>
         <div className='d-flex' style={{ height: '100%' }}>
           <aside
             className='bg-light p-3'
-            style={{ width: '30%', height: '100%', overflowY: 'scroll' }}
+            style={{ width: '25%', height: '100%', overflowY: 'scroll' }}
           >
             <h2>Users</h2>
             {users.length > 0 ? (
@@ -148,9 +160,7 @@ function Admin() {
                     }`}
                     to={`/admin/${u.uid}`}
                   >
-                    {String(u.name)
-                      .split('-')[0]
-                      .concat('...')}
+                    {u.name}
                   </Link>
                 </li>
               ))
@@ -167,7 +177,7 @@ function Admin() {
             }}
           >
             <div className='chat-box' style={{ flex: '1', height: '70vh' }}>
-              {uid === undefined && messages.length === 0 && (
+              {!uid && !messages && (
                 <div>
                   <h3 className='text-dark'>Chats</h3>
                   <p className='lead'>Select a chat to load the messages</p>
@@ -214,30 +224,32 @@ function Admin() {
               )}
             </div>
 
-            <div
-              className='chat-form'
-              style={{
-                height: '50px'
-              }}
-            >
-              <form
-                className='w-100 d-flex justify-content-between align-items-center'
-                onSubmit={e => handleSendMessage(e)}
+            {uid && (
+              <div
+                className='chat-form'
+                style={{
+                  height: '50px'
+                }}
               >
-                <div className='form-group w-100'>
-                  <input
-                    type='text'
-                    className='form-control mt-3'
-                    placeholder='Type to send message'
-                    value={message}
-                    onChange={e => setMessage(e.target.value)}
-                  />
-                </div>
-                <button className='btn btn-secondary' type='submit'>
-                  Send
-                </button>
-              </form>
-            </div>
+                <form
+                  className='w-100 d-flex justify-content-between align-items-center'
+                  onSubmit={e => handleSendMessage(e)}
+                >
+                  <div className='form-group w-100'>
+                    <input
+                      type='text'
+                      className='form-control mt-3'
+                      placeholder='Type to send message'
+                      value={message}
+                      onChange={e => setMessage(e.target.value)}
+                    />
+                  </div>
+                  <button className='btn btn-secondary' type='submit'>
+                    Send
+                  </button>
+                </form>
+              </div>
+            )}
           </main>
         </div>
       </div>

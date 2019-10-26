@@ -63,35 +63,52 @@ function User() {
   }
 
   return (
-    <div>
+    <div style={{ background: '#000', height: '100vh' }}>
       <header>
         <div className='container py-2'>
           <div>
-            <h1 className='text-center text-dark'>ACME</h1>
+            <h1 className='text-center text-white'>ACME.</h1>
           </div>
 
-          <ul className='nav nav-tabs'>
+          <ul
+            className='nav nav-tabs'
+            style={{ background: '#000', border: 'none' }}
+          >
             <li className='nav-item'>
-              <Link className='nav-link active' to='/'>
+              <Link
+                style={{ color: '#fff', borderBottom: '3px solid #fff' }}
+                className='nav-link'
+                to='/#'
+              >
                 Home
               </Link>
             </li>
             <li className='nav-item'>
-              <Link className='nav-link' to='/admin'>
-                Admin
+              <Link style={{ color: '#ccc' }} className='nav-link' to='/#'>
+                Features
+              </Link>
+            </li>
+            <li className='nav-item'>
+              <Link style={{ color: '#ccc' }} className='nav-link' to='/#'>
+                Contact
               </Link>
             </li>
           </ul>
         </div>
       </header>
-      <div className='jumbotron'>
+      <div
+        className='jumbotron text-white'
+        style={{
+          backgroundColor: '#000'
+        }}
+      >
         <div className='container text-center'>
-          <h1 className='display-4'>ACME</h1>
+          <h1 className='display-4'>ACME.</h1>
           <p className='lead'>
             ACME is a San Francisco based design agency. We build amazing web
             experiences
           </p>
-          <Link className='btn btn-primary btn-lg' to='/' role='button'>
+          <Link className='btn btn-light btn-lg' to='/' role='button'>
             Learn more
           </Link>
         </div>
