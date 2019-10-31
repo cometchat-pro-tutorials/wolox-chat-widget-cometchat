@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { CometChat } from '@cometchat-pro/chat'
 import { Widget, addResponseMessage, dropMessages } from 'react-chat-widget'
 import 'react-chat-widget/lib/styles.css'
@@ -6,8 +6,10 @@ import { Link } from 'react-router-dom'
 import config from '../config'
 
 function User() {
-  const [UID, setUID] = useState(null)
   useEffect(() => {
+    addResponseMessage(
+      'Hi, if you have any questions, please ask them here. Please note that if you refresh the page, all messages will be lost.'
+    )
     const createUser = async () => {
       try {
         const userResponse = await fetch(
@@ -17,7 +19,6 @@ function User() {
         const user = await json.user
 
         await CometChat.login(user.authToken)
-        setUID(user.uid)
       } catch (err) {
         console.log({ err })
       }
@@ -55,8 +56,7 @@ function User() {
     )
 
     try {
-      const message = await CometChat.sendMessage(textMessage)
-      console.log('Message sent successfully', message)
+      await CometChat.sendMessage(textMessage)
     } catch (error) {
       console.log('Message sending failed with error:', error)
     }
@@ -113,11 +113,7 @@ function User() {
           </Link>
         </div>
       </div>
-      <Widget
-        handleNewUserMessage={handleNewUserMessage}
-        title={`Live Chat. User ID - ${UID}`}
-        subtitle='Hi, if you have any questions, please ask them here. Please note that if you refresh the page, all messages will be lost.'
-      />
+      <Widget handleNewUserMessage={handleNewUserMessage} title={`ACME Chat`} />
     </div>
   )
 }

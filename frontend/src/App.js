@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import User from './components/user'
-import Admin from './components/admin'
+import AdminHome from './components/admin-home'
 
 function App() {
   return (
@@ -11,10 +11,10 @@ function App() {
           <User />
         </Route>
         <Route exact path='/admin'>
-          <Admin />
+          <AdminHome />
         </Route>
         <Route exact path='/admin/:uid'>
-          <Admin />
+          <AdminHome />
         </Route>
       </Router>
     </div>

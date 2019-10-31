@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { CometChat } from '@cometchat-pro/chat'
 import config from '../config'
+import uuid from 'uuid'
 
-function Admin() {
+function AdminHome() {
   const { uid } = useParams()
 
   const [users, setUsers] = useState([])
@@ -21,11 +22,13 @@ function Admin() {
         const json = await response.json()
         const admin = await json.user
 
-        const loggedInAdmin = await CometChat.login(admin.authToken)
-        if (loggedInAdmin) {
-          setIsLoggedIn(true)
-        } else {
-          createAuthToken()
+        if (admin !== undefined) {
+          const loggedInAdmin = await CometChat.login(admin.authToken)
+          if (loggedInAdmin) {
+            setIsLoggedIn(true)
+          } else {
+            createAuthToken()
+          }
         }
       } catch (err) {
         console.log({ err })
@@ -97,6 +100,23 @@ function Admin() {
     return () => CometChat.removeUserListener(listenerID)
   }, [users, messages, uid])
 
+  useEffect(() => {
+    const fetchPreviousMessages = async () => {
+      try {
+        const messagesRequest = new CometChat.MessagesRequestBuilder()
+          .setUID(uid)
+          .setLimit(50)
+          .build()
+        const previousMessages = await messagesRequest.fetchPrevious()
+        setMessages([...previousMessages])
+      } catch (err) {
+        console.log('Message fetching failed with error:', err)
+      }
+    }
+
+    if (uid) fetchPreviousMessages()
+  }, [uid])
+
   const handleSendMessage = async e => {
     e.preventDefault()
 
@@ -119,6 +139,15 @@ function Admin() {
   }
 
   return (
+    // <Layout>
+    //   <div className='chat-box' style={{ flex: '1', height: '70vh' }}>
+    //     <div>
+    //       <h3 className='text-dark'>Chats</h3>
+    //       <p className='lead'>Select a chat to load the messages</p>
+    //     </div>
+    //   </div>
+    // </Layout>
+
     <div style={{ height: '100vh' }}>
       <header
         className='bg-secondary text-white d-flex align-items-center'
@@ -199,7 +228,7 @@ function Admin() {
                     .map(m => (
                       <li
                         className='list-group-item mb-2 px-0'
-                        key={m.id}
+                        key={uuid()}
                         style={{
                           border: 0,
                           background: 'transparent',
@@ -257,4 +286,4 @@ function Admin() {
   )
 }
 
-export default Admin
+export default React.memo(AdminHome)
