@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import { CometChat } from '@cometchat-pro/chat'
 import config from '../config'
 import uuid from 'uuid'
 
-function AdminHome() {
-  const { uid } = useParams()
-
+function Admin({
+  match: {
+    params: { uid }
+  }
+}) {
   const [users, setUsers] = useState([])
   const [messages, setMessages] = useState([])
   const [message, setMessage] = useState('')
@@ -22,20 +23,35 @@ function AdminHome() {
         const json = await response.json()
         const admin = await json.user
 
-        if (admin !== undefined) {
-          const loggedInAdmin = await CometChat.login(admin.authToken)
-          if (loggedInAdmin) {
-            setIsLoggedIn(true)
-          } else {
-            createAuthToken()
-          }
-        }
+        await CometChat.login(admin.authToken)
+        setIsLoggedIn(true)
       } catch (err) {
         console.log({ err })
       }
     }
 
     createAuthToken()
+  }, [])
+
+  useEffect(() => {
+    const listenerId = 'message-listener-id'
+    const listenForNewMessages = () => {
+      CometChat.addMessageListener(
+        listenerId,
+        new CometChat.MessageListener({
+          onTextMessageReceived: msg => {
+            setMessages(prevMessages => [...prevMessages, msg])
+          }
+        })
+      )
+    }
+
+    listenForNewMessages()
+
+    return () => {
+      CometChat.removeMessageListener(listenerId)
+      CometChat.logout()
+    }
   }, [])
 
   useEffect(() => {
@@ -46,27 +62,8 @@ function AdminHome() {
       setUsers([...users])
     }
 
-    if (isLoggedIn) {
-      getUsers()
-    }
+    getUsers()
   }, [isLoggedIn])
-
-  useEffect(() => {
-    const listenerId = 'message-listener-id'
-    const listenForNewMessages = () => {
-      CometChat.addMessageListener(
-        listenerId,
-        new CometChat.MessageListener({
-          onTextMessageReceived: msg => {
-            setMessages([...messages, msg])
-          }
-        })
-      )
-    }
-
-    listenForNewMessages()
-    return () => CometChat.removeMessageListener(listenerId)
-  }, [messages, users])
 
   useEffect(() => {
     const listenerID = 'user-listener-id'
@@ -83,8 +80,7 @@ function AdminHome() {
           if (targetUser && targetUser.uid === offlineUser.uid) {
             const otherUsers = users.filter(u => u.uid !== offlineUser.uid)
             setUsers([...otherUsers, offlineUser])
-            const messagesCopy = [...messages]
-            const messagesToKeep = messagesCopy.filter(
+            const messagesToKeep = messages.filter(
               m =>
                 m.receiver !== uid &&
                 m.sender.uid !== config.adminUID &&
@@ -114,7 +110,7 @@ function AdminHome() {
       }
     }
 
-    if (uid) fetchPreviousMessages()
+    if (uid !== undefined) fetchPreviousMessages()
   }, [uid])
 
   const handleSendMessage = async e => {
@@ -139,15 +135,6 @@ function AdminHome() {
   }
 
   return (
-    // <Layout>
-    //   <div className='chat-box' style={{ flex: '1', height: '70vh' }}>
-    //     <div>
-    //       <h3 className='text-dark'>Chats</h3>
-    //       <p className='lead'>Select a chat to load the messages</p>
-    //     </div>
-    //   </div>
-    // </Layout>
-
     <div style={{ height: '100vh' }}>
       <header
         className='bg-secondary text-white d-flex align-items-center'
@@ -158,7 +145,7 @@ function AdminHome() {
             Dashboard
           </Link>
         </h3>
-        {uid && (
+        {uid !== undefined && (
           <span>
             {' - '}
             {uid}
@@ -169,11 +156,11 @@ function AdminHome() {
         <div className='d-flex' style={{ height: '100%' }}>
           <aside
             className='bg-light p-3'
-            style={{ width: '25%', height: '100%', overflowY: 'scroll' }}
+            style={{ width: '30%', height: '100%', overflowY: 'scroll' }}
           >
-            <h2>Users</h2>
+            <h2 className='pl-4'>Users</h2>
             {users.length > 0 ? (
-              users.map(u => (
+              users.map(user => (
                 <li
                   style={{
                     background: 'transparent',
@@ -181,20 +168,20 @@ function AdminHome() {
                     borderBottom: '1px solid #ccc'
                   }}
                   className='list-group-item'
-                  key={u.uid}
+                  key={user.uid}
                 >
                   <Link
                     className={`lead ${
-                      u.status === 'offline' ? 'text-link' : 'text-success'
+                      user.status === 'offline' ? 'text-link' : 'text-success'
                     }`}
-                    to={`/admin/${u.uid}`}
+                    to={`/admin/${user.uid}`}
                   >
-                    {u.name}
+                    {user.name}
                   </Link>
                 </li>
               ))
             ) : (
-              <span className='text-center'>Fetching users</span>
+              <span className='text-center pl-4 mt-4'>Fetching users</span>
             )}
           </aside>
           <main
@@ -206,7 +193,7 @@ function AdminHome() {
             }}
           >
             <div className='chat-box' style={{ flex: '1', height: '70vh' }}>
-              {!uid && !messages && (
+              {uid === undefined && !messages.length && (
                 <div>
                   <h3 className='text-dark'>Chats</h3>
                   <p className='lead'>Select a chat to load the messages</p>
@@ -253,7 +240,7 @@ function AdminHome() {
               )}
             </div>
 
-            {uid && (
+            {uid !== undefined && (
               <div
                 className='chat-form'
                 style={{
@@ -286,4 +273,4 @@ function AdminHome() {
   )
 }
 
-export default React.memo(AdminHome)
+export default Admin

@@ -26,11 +26,11 @@ async function createAuthToken(uid) {
     )
     return response.data.data
   } catch (err) {
-    console.log({ err })
+    console.log({ 'create-auth-token': err })
   }
 }
 
-app.get('/api/create-user', async (req, res) => {
+app.get('/api/create-user', async (_, res) => {
   const randomUUID = uuidv4()
   const newUser = {
     uid: randomUUID,
@@ -47,7 +47,7 @@ app.get('/api/create-user', async (req, res) => {
     const user = await createAuthToken(uid)
     res.status(200).json({ user })
   } catch (err) {
-    console.log({ err })
+    console.log({ 'create-user': err })
   }
 })
 
@@ -57,7 +57,7 @@ app.get('/api/authenticate-user', async (req, res) => {
   res.status(200).json({ user })
 })
 
-app.get('/api/get-users', async (req, res) => {
+app.get('/api/get-users', async (_, res) => {
   try {
     const response = await axios.get('https://api.cometchat.com/v1.8/users', {
       headers
@@ -66,7 +66,7 @@ app.get('/api/get-users', async (req, res) => {
     const users = await response.data.data.filter(user => user.uid !== adminUID)
     res.status(200).json({ users })
   } catch (err) {
-    console.log({ err })
+    console.log({ 'get-users': err })
   }
 })
 

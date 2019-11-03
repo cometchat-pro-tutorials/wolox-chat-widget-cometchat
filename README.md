@@ -17,7 +17,7 @@ In order to run the demo application locally, you'll need to follow the followin
 3. You should be redirected to your newly created app, now click on the **Explore** button to view your app details.
 4. Go to the **API Keys** tab and you should see an already generated **App ID** and **API Key**
 5. Copy the details from the list with **Full Access** as Scope.
-6. Go to the **Users** tab and create a new user. Use **Admin** as the name and **admin** as the uid of the user.
+6. Go to the **Users** tab and create a new user(i.e the admin). Use **Admin** as the name and **admin** as the uid of the user.
 7. Clone this repository and move into the newly created project directory. Then `cd backend`, create a `.env` file and paste the following snippet.
 
 ```

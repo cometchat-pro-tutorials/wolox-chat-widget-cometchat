@@ -23,14 +23,7 @@ function User() {
         console.log({ err })
       }
     }
-
     createUser()
-
-    return () => {
-      CometChat.removeMessageListener('client-listener-key')
-      CometChat.logout()
-      dropMessages()
-    }
   }, [])
 
   useEffect(() => {
@@ -44,7 +37,11 @@ function User() {
       })
     )
 
-    return () => CometChat.removeMessageListener(listenerId)
+    return () => {
+      CometChat.removeMessageListener(listenerId)
+      CometChat.logout()
+      dropMessages()
+    }
   }, [])
 
   const handleNewUserMessage = async newMessage => {
