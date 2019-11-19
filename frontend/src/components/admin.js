@@ -171,9 +171,7 @@ function Admin({
                   key={user.uid}
                 >
                   <Link
-                    className={`lead ${
-                      user.status === 'offline' ? 'text-link' : 'text-success'
-                    }`}
+                    className='lead text-link'
                     to={`/admin/${user.uid}`}
                   >
                     {user.name}
