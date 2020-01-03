@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CometChat } from '@cometchat-pro/chat'
 import { Widget, addResponseMessage, dropMessages } from 'react-chat-widget'
 import 'react-chat-widget/lib/styles.css'
@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom'
 import config from '../config'
 
 function User() {
+  const [user, setUser] = useState(null)
+
   useEffect(() => {
     addResponseMessage(
       'Hi, if you have any questions, please ask them here. Please note that if you refresh the page, all messages will be lost.'
@@ -17,7 +19,7 @@ function User() {
         )
         const json = await userResponse.json()
         const user = await json.user
-
+        setUser(user)
         await CometChat.login(user.authToken)
       } catch (err) {
         console.log({ err })
@@ -36,7 +38,6 @@ function User() {
         }
       })
     )
-
     return () => {
       CometChat.removeMessageListener(listenerId)
       CometChat.logout()
@@ -48,10 +49,8 @@ function User() {
     const textMessage = new CometChat.TextMessage(
       config.adminUID,
       newMessage,
-      CometChat.MESSAGE_TYPE.TEXT,
       CometChat.RECEIVER_TYPE.USER
     )
-
     try {
       await CometChat.sendMessage(textMessage)
     } catch (error) {
@@ -66,7 +65,6 @@ function User() {
           <div>
             <h1 className='text-center text-white'>ACME.</h1>
           </div>
-
           <ul
             className='nav nav-tabs'
             style={{ background: '#000', border: 'none' }}

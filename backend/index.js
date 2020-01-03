@@ -14,21 +14,8 @@ const headers = {
   'content-type': 'application/json',
   accept: 'application/json'
 }
-
 const adminUID = 'admin'
-
-async function createAuthToken(uid) {
-  try {
-    const response = await axios.post(
-      `https://api.cometchat.com/v1.8/users/${uid}/auth_tokens`,
-      null,
-      { headers }
-    )
-    return response.data.data
-  } catch (err) {
-    console.log({ 'create-auth-token': err })
-  }
-}
+const baseUrl = 'https://api-eu.cometchat.io/v2.0/users'
 
 app.get('/api/create-user', async (_, res) => {
   const randomUUID = uuidv4()
@@ -36,20 +23,29 @@ app.get('/api/create-user', async (_, res) => {
     uid: randomUUID,
     name: randomUUID
   }
-
   try {
-    const response = await axios.post(
-      'https://api.cometchat.com/v1.8/users',
-      JSON.stringify(newUser),
-      { headers }
-    )
+    const response = await axios.post(baseUrl, JSON.stringify(newUser), {
+      headers
+    })
     const uid = await response.data.data.uid
     const user = await createAuthToken(uid)
     res.status(200).json({ user })
   } catch (err) {
-    console.log({ 'create-user': err })
+    console.log({ 'create user error': err })
   }
 })
+
+async function createAuthToken(uid) {
+  try {
+    const response = await axios.post(`${baseUrl}/${uid}/auth_tokens`, null, {
+      headers
+    })
+    const authenticatedUser = response.data.data
+    return authenticatedUser
+  } catch (err) {
+    console.log({ 'create auth token error': err })
+  }
+}
 
 app.get('/api/authenticate-user', async (req, res) => {
   const uid = await req.query.uid
@@ -59,14 +55,13 @@ app.get('/api/authenticate-user', async (req, res) => {
 
 app.get('/api/get-users', async (_, res) => {
   try {
-    const response = await axios.get('https://api.cometchat.com/v1.8/users', {
+    const response = await axios.get(baseUrl, {
       headers
     })
-
     const users = await response.data.data.filter(user => user.uid !== adminUID)
     res.status(200).json({ users })
   } catch (err) {
-    console.log({ 'get-users': err })
+    console.log({ 'get users error': err })
   }
 })
 

@@ -22,14 +22,12 @@ function Admin({
         )
         const json = await response.json()
         const admin = await json.user
-
         await CometChat.login(admin.authToken)
         setIsLoggedIn(true)
       } catch (err) {
         console.log({ err })
       }
     }
-
     createAuthToken()
   }, [])
 
@@ -45,9 +43,7 @@ function Admin({
         })
       )
     }
-
     listenForNewMessages()
-
     return () => {
       CometChat.removeMessageListener(listenerId)
       CometChat.logout()
@@ -61,13 +57,11 @@ function Admin({
       const users = await json.users
       setUsers([...users])
     }
-
     getUsers()
   }, [isLoggedIn])
 
   useEffect(() => {
     const listenerID = 'user-listener-id'
-
     CometChat.addUserListener(
       listenerID,
       new CometChat.UserListener({
@@ -84,24 +78,24 @@ function Admin({
               m =>
                 m.receiver !== uid &&
                 m.sender.uid !== config.adminUID &&
-                (m.receiver !== config.adminUID && m.sender.uid !== uid)
+                m.receiver !== config.adminUID &&
+                m.sender.uid !== uid
             )
-
             setMessages(messagesToKeep)
           }
         }
       })
     )
-
     return () => CometChat.removeUserListener(listenerID)
   }, [users, messages, uid])
 
   useEffect(() => {
     const fetchPreviousMessages = async () => {
+      console.log(uid)
       try {
         const messagesRequest = new CometChat.MessagesRequestBuilder()
-          .setUID(uid)
           .setLimit(50)
+          .setUID(uid)
           .build()
         const previousMessages = await messagesRequest.fetchPrevious()
         setMessages([...previousMessages])
@@ -109,7 +103,6 @@ function Admin({
         console.log('Message fetching failed with error:', err)
       }
     }
-
     if (uid !== undefined) fetchPreviousMessages()
   }, [uid])
 
@@ -118,14 +111,11 @@ function Admin({
 
     const _message = message
     setMessage('')
-
     const textMessage = new CometChat.TextMessage(
       uid,
       _message,
-      CometChat.MESSAGE_TYPE.TEXT,
       CometChat.RECEIVER_TYPE.USER
     )
-
     try {
       const msg = await CometChat.sendMessage(textMessage)
       setMessages([...messages, msg])
@@ -170,10 +160,7 @@ function Admin({
                   className='list-group-item'
                   key={user.uid}
                 >
-                  <Link
-                    className='lead text-link'
-                    to={`/admin/${user.uid}`}
-                  >
+                  <Link className='lead' to={`/admin/${user.uid}`}>
                     {user.name}
                   </Link>
                 </li>
@@ -197,47 +184,38 @@ function Admin({
                   <p className='lead'>Select a chat to load the messages</p>
                 </div>
               )}
-
               {messages.length > 0 ? (
                 <ul
                   className='list-group px-3'
                   style={{ height: '100%', overflowY: 'scroll' }}
                 >
-                  {messages
-                    .filter(
-                      m =>
-                        (m.receiver === uid &&
-                          m.sender.uid === config.adminUID) ||
-                        (m.receiver === config.adminUID && m.sender.uid === uid)
-                    )
-                    .map(m => (
-                      <li
-                        className='list-group-item mb-2 px-0'
-                        key={uuid()}
+                  {messages.map(m => (
+                    <li
+                      className='list-group-item mb-2 px-0'
+                      key={uuid()}
+                      style={{
+                        border: 0,
+                        background: 'transparent',
+                        textAlign: m.sender.uid === uid ? 'left' : 'right'
+                      }}
+                    >
+                      <span
+                        className='py-2 px-3'
                         style={{
-                          border: 0,
-                          background: 'transparent',
-                          textAlign: m.sender.uid === uid ? 'left' : 'right'
+                          background:
+                            m.sender.uid === uid ? '#F4F7F9' : '#A3EAF7',
+                          borderRadius: '4px'
                         }}
                       >
-                        <span
-                          className='py-2 px-3'
-                          style={{
-                            background:
-                              m.sender.uid === uid ? '#F4F7F9' : '#A3EAF7',
-                            borderRadius: '4px'
-                          }}
-                        >
-                          {m.text}
-                        </span>
-                      </li>
-                    ))}
+                        {m.text}
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               ) : (
                 <p className='lead'>No messages</p>
               )}
             </div>
-
             {uid !== undefined && (
               <div
                 className='chat-form'
@@ -270,5 +248,4 @@ function Admin({
     </div>
   )
 }
-
 export default Admin
